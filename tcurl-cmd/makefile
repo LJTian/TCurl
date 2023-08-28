@@ -1,6 +1,6 @@
 
-IMAGES_NAME ?="ljtian/tcurl"
-VERSION ?="tmpe_version"
+IMAGES_NAME ?=ljtian/tcurl
+VERSION ?=100
 
 all: docker_build
 	@echo "使用方式如下："

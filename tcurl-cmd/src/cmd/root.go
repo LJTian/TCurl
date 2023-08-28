@@ -5,6 +5,7 @@ import (
 	"github.com/ljtian/tcurl/tcurl-cmd/pkg/curl"
 	"github.com/ljtian/tcurl/tcurl-cmd/pkg/db"
 	"github.com/ljtian/tcurl/tcurl-cmd/pkg/define"
+	"github.com/ljtian/tcurl/tcurl-cmd/pkg/envVar"
 	"math/rand"
 	"os"
 	"time"
@@ -16,15 +17,26 @@ var AllArgs define.TCurl
 var DbArgs define.DBInfo
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&AllArgs.Uri, "uri", "U", "", "web service addr")
-	rootCmd.PersistentFlags().StringVarP(&AllArgs.ClientName, "clientName", "N", "", "client name")
-	rootCmd.PersistentFlags().IntVarP(&AllArgs.Times, "times", "T", 100, "Number of cycles")
-	rootCmd.PersistentFlags().IntVarP(&AllArgs.Intervals, "intervals", "I", 5, "Intervals")
-	rootCmd.PersistentFlags().IntVarP(&AllArgs.TimeOut, "timeout", "t", 5, "timeout period")
-	rootCmd.PersistentFlags().IntVarP(&AllArgs.CoroutineNum, "coroutineNum", "c", 5, "coroutine number")
-	rootCmd.PersistentFlags().BoolVarP(&AllArgs.SaveDB, "saveDB", "S", false, "Whether the data is saved in the database")
 
-	rootCmd.PersistentFlags().StringVarP(&DbArgs.DbConnectUri, "dbUri", "D", "", "Database connect address")
+	// 设置默认环境变量，无值时才会设置
+	envVar.SetDefaultEnv([]envVar.DefaultEnv{
+		{envVar.Uri, ""},
+		{envVar.ClientName, ""},
+		{envVar.Times, "100"},
+		{envVar.TimeInterval, "5"},
+		{envVar.TimeOut, "5"},
+		{envVar.CoroutineNum, "5"},
+		{envVar.SaveDB, "false"},
+		{envVar.DbConnectUri, ""},
+	})
+	rootCmd.PersistentFlags().StringVarP(&AllArgs.Uri, "uri", "U", envVar.GetEnvString(envVar.Uri), "web service addr")
+	rootCmd.PersistentFlags().StringVarP(&AllArgs.ClientName, "clientName", "N", envVar.GetEnvString(envVar.ClientName), "client name")
+	rootCmd.PersistentFlags().IntVarP(&AllArgs.Times, "times", "T", envVar.GetEnvInt(envVar.Times), "Number of cycles")
+	rootCmd.PersistentFlags().IntVarP(&AllArgs.Intervals, "intervals", "I", envVar.GetEnvInt(envVar.TimeInterval), "Intervals")
+	rootCmd.PersistentFlags().IntVarP(&AllArgs.TimeOut, "timeout", "t", envVar.GetEnvInt(envVar.TimeOut), "timeout period")
+	rootCmd.PersistentFlags().IntVarP(&AllArgs.CoroutineNum, "coroutineNum", "c", envVar.GetEnvInt(envVar.CoroutineNum), "coroutine number")
+	rootCmd.PersistentFlags().BoolVarP(&AllArgs.SaveDB, "saveDB", "S", envVar.GetEnvBool(envVar.SaveDB), "Whether the data is saved in the database")
+	rootCmd.PersistentFlags().StringVarP(&DbArgs.DbConnectUri, "dbUri", "D", envVar.GetEnvString(envVar.DbConnectUri), "Database connect address")
 }
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -46,7 +58,7 @@ var rootCmd = &cobra.Command{
 	Short: "TCurl is an http access command client",
 	Long:  `TCurl is an http client mainly used for web service access and recording command line programs`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//fmt.Println(AllArgs)
+		fmt.Println(AllArgs)
 		if AllArgs.Uri == "" {
 			fmt.Println("URI 为空， 请使用 -h 查看使用说明")
 			os.Exit(1)

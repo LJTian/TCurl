@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ljtian/tcurl/tcurl-cmd/pkg/db"
 	"github.com/ljtian/tcurl/tcurl-cmd/pkg/echarts"
+	"github.com/ljtian/tcurl/tcurl-cmd/pkg/envVar"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -12,7 +13,7 @@ var ClientName string
 
 func init() {
 	rootCmd.AddCommand(showCmd)
-	showCmd.PersistentFlags().StringVarP(&ClientName, "ClientName", "C", "", "clientName")
+	showCmd.PersistentFlags().StringVarP(&ClientName, "ClientName", "C", envVar.GetEnvString(envVar.ClientName), "clientName")
 }
 
 var showCmd = &cobra.Command{
